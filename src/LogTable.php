@@ -13,7 +13,8 @@ use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Resources\Components\Tab;
+use Filament\Panel;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -29,7 +30,7 @@ final class LogTable extends Page implements HasTable
     #[Url(except: null)]
     public ?string $activeTab = null;
 
-    protected static string $view = 'filament-log-viewer::log-table';
+    protected string $view = 'filament-log-viewer::log-table';
 
     /**
      * @var array<string | int, Tab>
@@ -55,7 +56,7 @@ final class LogTable extends Page implements HasTable
     }
 
     /** @throws Exception */
-    public static function getSlug(): string
+    public static function getSlug(?Panel $panel = null): string
     {
         return self::getPlugin()->getNavigationUrl();
     }
@@ -195,8 +196,6 @@ final class LogTable extends Page implements HasTable
     /** @throws Exception */
     private static function getPlugin(): FilamentLogViewer
     {
-        $panel = Filament::getCurrentPanel();
-
-        return $panel?->getPlugin('filament-log-viewer');
+        return filament('filament-log-viewer');
     }
 }
