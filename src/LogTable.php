@@ -20,15 +20,10 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Livewire\Attributes\Url;
 
 final class LogTable extends Page implements HasTable
 {
     use InteractsWithTable;
-
-    #[Url(except: null)]
-    public ?string $activeTab = null;
 
     protected string $view = 'filament-log-viewer::log-table';
 
@@ -77,11 +72,6 @@ final class LogTable extends Page implements HasTable
             ->query(
                 Log::query()
             )
-            ->modifyQueryUsing(function (Builder $query): void {
-                if ($this->activeTab) {
-                    $query->where('log_level', $this->activeTab);
-                }
-            })
             ->columns([
                 TextColumn::make('log_level')
                     ->badge(),
