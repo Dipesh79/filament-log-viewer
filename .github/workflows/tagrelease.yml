@@ -2,7 +2,7 @@ name: Bump version
 on:
     push:
         branches:
-            - master
+            - filament-v3
 
 jobs:
     build:
