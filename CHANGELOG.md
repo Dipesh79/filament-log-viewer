@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.0.0 - 2025-08-04
+
+### 🎉 New Features
+
+- feat: Filament v4 support (#24) by @achyutkneupane
+- feat: log level filter added (#25) by @achyutkneupane
+
 ## v0.5.3 - 2025-08-04
 
 ### 🏗️ Build System
