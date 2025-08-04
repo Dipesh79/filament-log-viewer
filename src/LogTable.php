@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace AchyutN\FilamentLogViewer;
 
-use AchyutN\FilamentLogViewer\Enums\LogLevel;
 use AchyutN\FilamentLogViewer\Filters\DateRangeFilter;
 use AchyutN\FilamentLogViewer\Model\Log;
 use Exception;
@@ -15,8 +14,8 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Panel;
-use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Support\Colors\Color;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -32,11 +31,6 @@ final class LogTable extends Page implements HasTable
     public ?string $activeTab = null;
 
     protected string $view = 'filament-log-viewer::log-table';
-
-    /**
-     * @var array<string | int, Tab>
-     */
-    private array $cachedTabs;
 
     /** @throws Exception */
     public static function getNavigationLabel(): string
@@ -134,45 +128,9 @@ final class LogTable extends Page implements HasTable
             ->filters([
                 DateRangeFilter::make('date'),
             ])
+            ->deferFilters(false)
+            ->deferColumnManager(false)
             ->defaultSort('date', 'desc');
-    }
-
-    /**
-     * @return array<string | int, Tab>
-     */
-    public function getCachedTabs(): array
-    {
-        return $this->cachedTabs ??= $this->getTabs();
-    }
-
-    /** @return array<string, mixed> */
-    public function getTabs(): array
-    {
-        $all_logs = [
-            null => Tab::make('All Logs')
-                ->badge(fn () => Log::query()->count() ?: null),
-        ];
-
-        $tabs = collect(LogLevel::cases())
-            ->mapWithKeys(fn (LogLevel $level) => [
-                $level->value => Tab::make($level->getLabel())
-                    ->badge(
-                        fn () => Log::query()->where('log_level', $level)->count() ?: null
-                    )
-                    ->badgeColor($level->getColor()),
-            ])->toArray();
-
-        return array_merge($all_logs, $tabs);
-    }
-
-    public function getDefaultActiveTab(): null
-    {
-        return null;
-    }
-
-    public function updateTab(?LogLevel $level): void
-    {
-        $this->activeTab = $level?->value;
     }
 
     protected function getHeaderActions(): array
@@ -181,7 +139,7 @@ final class LogTable extends Page implements HasTable
             Action::make('clear')
                 ->visible(Log::query()->count() > 0)
                 ->label('Clear Logs')
-                ->icon('heroicon-o-trash')
+                ->icon(Heroicon::Trash)
                 ->color(Color::Red)
                 ->requiresConfirmation()
                 ->action(function (): void {
