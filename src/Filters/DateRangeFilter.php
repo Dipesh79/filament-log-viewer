@@ -19,12 +19,13 @@ final class DateRangeFilter
         return Filter::make($name)
             ->label('Date Range')
             ->indicator('Date Range')
-            ->form([
+            ->schema([
                 DatePicker::make('from')
                     ->label('From'),
                 DatePicker::make('until')
                     ->label('Until'),
             ])
+            ->columns()
             ->query(fn (Builder $query, array $data): Builder => $query
                 ->when(
                     $data['from'],
