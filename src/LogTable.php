@@ -8,6 +8,7 @@ use AchyutN\FilamentLogViewer\Enums\LogLevel;
 use AchyutN\FilamentLogViewer\Filters\DateRangeFilter;
 use AchyutN\FilamentLogViewer\Model\Log;
 use Exception;
+use Filament\Actions\ViewAction;
 use Filament\Facades\Filament;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -115,9 +116,9 @@ final class LogTable extends Page implements HasTable
                     ->dateTimeTooltip()
                     ->sortable(),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make('view')
-                    ->infolist([
+            ->recordActions([
+                ViewAction::make('view')
+                    ->schema([
                         RepeatableEntry::make('stack')
                             ->hiddenLabel()
                             ->schema([
