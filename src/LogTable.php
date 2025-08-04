@@ -8,8 +8,8 @@ use AchyutN\FilamentLogViewer\Enums\LogLevel;
 use AchyutN\FilamentLogViewer\Filters\DateRangeFilter;
 use AchyutN\FilamentLogViewer\Model\Log;
 use Exception;
+use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
-use Filament\Facades\Filament;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
@@ -17,7 +17,7 @@ use Filament\Pages\Page;
 use Filament\Panel;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Support\Colors\Color;
-use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
@@ -89,9 +89,9 @@ final class LogTable extends Page implements HasTable
                 }
             })
             ->columns([
-                Tables\Columns\TextColumn::make('log_level')
+                TextColumn::make('log_level')
                     ->badge(),
-                Tables\Columns\TextColumn::make('env')
+                TextColumn::make('env')
                     ->label('Environment')
                     ->color(fn (string $state): array => match ($state) {
                         'local' => Color::Blue,
@@ -102,15 +102,15 @@ final class LogTable extends Page implements HasTable
                     })
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->badge(),
-                Tables\Columns\TextColumn::make('file')
+                TextColumn::make('file')
                     ->label('File Name')
                     ->badge()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('message')
+                TextColumn::make('message')
                     ->searchable()
                     ->label('Summary')
                     ->wrap(),
-                Tables\Columns\TextColumn::make('date')
+                TextColumn::make('date')
                     ->label('Occurred')
                     ->since()
                     ->dateTimeTooltip()
@@ -178,7 +178,7 @@ final class LogTable extends Page implements HasTable
     protected function getHeaderActions(): array
     {
         return [
-            \Filament\Actions\Action::make('clear')
+            Action::make('clear')
                 ->visible(Log::query()->count() > 0)
                 ->label('Clear Logs')
                 ->icon('heroicon-o-trash')
