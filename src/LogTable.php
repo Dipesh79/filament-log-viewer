@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AchyutN\FilamentLogViewer;
 
 use AchyutN\FilamentLogViewer\Filters\DateRangeFilter;
+use AchyutN\FilamentLogViewer\Filters\LogLevelFilter;
 use AchyutN\FilamentLogViewer\Model\Log;
 use Exception;
 use Filament\Actions\Action;
@@ -15,10 +16,12 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Panel;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Table;
 
 final class LogTable extends Page implements HasTable
@@ -115,9 +118,14 @@ final class LogTable extends Page implements HasTable
                     ->slideOver(),
             ])
             ->poll(self::getPlugin()->getPollingTime())
-            ->filters([
-                DateRangeFilter::make('date'),
-            ])
+            ->filters(
+                [
+                    LogLevelFilter::make(),
+                    DateRangeFilter::make('date'),
+                ]
+            )
+            ->filtersFormWidth(Width::ExtraLarge)
+            ->filtersFormColumns(1)
             ->deferFilters(false)
             ->deferColumnManager(false)
             ->defaultSort('date', 'desc');
