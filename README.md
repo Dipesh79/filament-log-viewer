@@ -40,11 +40,11 @@ After installation, visit `/logs` in your Filament panel. You will see a table o
 - **Message** – Short summary of the log
 - **Occurred** – Human-readable date/time
 
-![Table Preview](https://hamrocdn.com/4WCWYgw7EPjB)
+![Table Preview](https://hamrocdn.com/75qlRGETrri6)
 
 Click the view action to inspect stack traces.
 
-![Stack Tracing](https://hamrocdn.com/ZrA8W53Nx3CO)
+![Stack Tracing](https://hamrocdn.com/wPKsaqoXH5H4)
 
 ### Filters
 
@@ -52,13 +52,19 @@ Click the view action to inspect stack traces.
 
 You can filter the logs according to log level. The filters are available as tabs above the table:
 
-![Table Filters](https://hamrocdn.com/175hFkEVdrDl)
+![Log level Filters](https://hamrocdn.com/wpzpwsrvZaxp)
 
 #### Date
 
 You can filter logs by date using the date picker in the top right corner of the table. This allows you to select a specific date range to view logs.
 
-![Date Filter](https://hamrocdn.com/q9sILZZYuxlN)
+![Date Filter](https://hamrocdn.com/am_RAj2VQHiG)
+
+#### Toggle Columns
+
+You can toggle the visibility of the **Environment** and **File** columns by clicking the eye icon in the top right corner of the table.
+
+![Toggle Columns](https://hamrocdn.com/q4eZM97btUf2)
 
 ## Extending
 
@@ -79,10 +85,10 @@ FilamentLogViewer::make()
 
 ## Filament Compatibility
 
-| Version             | Filament Version |
-|---------------------|------------------|
-| `^0.x`              | Filament v3      |
-| `^1.0`              | Filament v4      |
+| Version | Filament Version |
+|---------|------------------|
+| `^0.x`  | Filament v3      |
+| `^1.x`  | Filament v4      |
 
 ## License
 
