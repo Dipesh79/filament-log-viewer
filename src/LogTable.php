@@ -75,7 +75,7 @@ final class LogTable extends Page implements HasTable
     {
         return $table
             ->records(
-                fn (?array $filters): Collection => collect(Log::getRows())
+                fn (?array $filters, ?string $sortColumn, ?string $sortDirection): Collection => collect(Log::getRows())
                     ->when(
                         ! $this->tableIsUnscoped(),
                         fn (Collection $data): Collection => $data->where(
@@ -83,22 +83,30 @@ final class LogTable extends Page implements HasTable
                             $this->activeTab
                         ),
                     )
-                ->when(
-                    filled($filters['date']['from']),
-                    fn (Collection $data): Collection => $data->where(
-                        'date',
-                        '>=',
-                        $filters['date']['from']
+                    ->when(
+                        filled($filters['date']['from']),
+                        fn (Collection $data): Collection => $data->where(
+                            'date',
+                            '>=',
+                            $filters['date']['from']
+                        )
                     )
-                )
-                ->when(
-                    filled($filters['date']['until']),
-                    fn (Collection $data): Collection => $data->where(
-                        'date',
-                        '<=',
-                        $filters['date']['until']
+                    ->when(
+                        filled($filters['date']['until']),
+                        fn (Collection $data): Collection => $data->where(
+                            'date',
+                            '<=',
+                            $filters['date']['until']
+                        )
                     )
-                )
+                    ->when(
+                        filled($sortColumn),
+                        fn (Collection $data): Collection => $data->sortBy(
+                            $sortColumn,
+                            SORT_REGULAR,
+                            $sortDirection === 'desc',
+                        )
+                    )
             )
             ->columns([
                 TextColumn::make('log_level')
@@ -124,6 +132,7 @@ final class LogTable extends Page implements HasTable
                 TextColumn::make('date')
                     ->label('Occurred')
                     ->since()
+                    ->sortable()
                     ->dateTimeTooltip(),
             ])
             ->recordActions([
