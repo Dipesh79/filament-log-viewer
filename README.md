@@ -87,8 +87,10 @@ FilamentLogViewer::make()
 
 | Version | Filament Version |
 |---------|------------------|
-| `^0.x`  | Filament v3      |
 | `^1.x`  | Filament v4      |
+| `^0.x`  | Filament v3      |
+
+Make sure you're using the appropriate version of this package for your Filament installation.
 
 ## License
 
