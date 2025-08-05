@@ -143,7 +143,9 @@ final class LogTable extends Page implements HasTable
                 ->label('Refresh')
                 ->icon(Heroicon::ArrowPath)
                 ->outlined()
-                ->action(function () { $this->refresh(); }),
+                ->action(function (): void {
+                    $this->refresh();
+                }),
             Action::make('clear')
                 ->visible(Log::query()->count() > 0)
                 ->label('Clear Logs')
