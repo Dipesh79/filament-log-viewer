@@ -83,6 +83,22 @@ final class LogTable extends Page implements HasTable
                             $this->activeTab
                         ),
                     )
+                ->when(
+                    filled($filters['date']['from']),
+                    fn (Collection $data): Collection => $data->where(
+                        'date',
+                        '>=',
+                        $filters['date']['from']
+                    )
+                )
+                ->when(
+                    filled($filters['date']['until']),
+                    fn (Collection $data): Collection => $data->where(
+                        'date',
+                        '<=',
+                        $filters['date']['until']
+                    )
+                )
             )
             ->columns([
                 TextColumn::make('log_level')
