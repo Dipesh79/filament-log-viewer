@@ -13,12 +13,8 @@ trait LogLevelTabFilter
 {
     use HasTabs;
 
-    public string $unscopedLogLevel = "all-logs";
+    public string $unscopedLogLevel = 'all-logs';
 
-    /**
-     * @param string $tab
-     * @return bool
-     */
     public function tabIsActive(string $tab): bool
     {
         if ($tab === $this->unscopedLogLevel) {
@@ -26,6 +22,11 @@ trait LogLevelTabFilter
         }
 
         return $this->activeTab === $tab;
+    }
+
+    public function tableIsUnscoped(): bool
+    {
+        return in_array($this->activeTab, [null, $this->unscopedLogLevel], true);
     }
 
     /** @return array<string, mixed> */

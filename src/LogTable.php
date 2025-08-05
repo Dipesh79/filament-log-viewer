@@ -77,7 +77,7 @@ final class LogTable extends Page implements HasTable
                 Log::query()
             )
             ->modifyQueryUsing(function (Builder $query): void {
-                if ($this->activeTab !== 'all-logs' && filled($this->activeTab)) {
+                if (! $this->tableIsUnscoped()) {
                     $query->where('log_level', $this->activeTab);
                 }
             })
