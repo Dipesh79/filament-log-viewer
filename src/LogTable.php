@@ -21,6 +21,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 final class LogTable extends Page implements HasTable
@@ -73,7 +74,7 @@ final class LogTable extends Page implements HasTable
     {
         return $table
             ->records(
-                function (?array $filters, ?string $sortColumn, ?string $sortDirection, ?string $search, int $page, int $recordsPerPage): Collection {
+                function (?array $filters, ?string $sortColumn, ?string $sortDirection, ?string $search, int $page, int $recordsPerPage): LengthAwarePaginator {
                     $records = Collection::wrap(Log::getRows())
                         ->map(function (array $log): array {
                             $log['stack'] = json_decode($log['stack'] ?? []);
@@ -122,9 +123,15 @@ final class LogTable extends Page implements HasTable
                                     mb_strtolower((string)$search)
                                 )
                             )
-                        )
+                        );
+                    $paginatedRecords = $records
                         ->forPage($page, $recordsPerPage);
-                    return $records;
+                    return new LengthAwarePaginator(
+                        $paginatedRecords,
+                        total: count($records),
+                        perPage: $recordsPerPage,
+                        currentPage: $page,
+                    );
                 })
             ->columns([
                 TextColumn::make('log_level')
