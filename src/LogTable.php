@@ -166,9 +166,9 @@ final class LogTable extends Page implements HasTable
                     ])
                     ->modalSubmitAction(false)
                     ->modalCancelAction(false)
-                    ->modalHeading("Stack Trace")
+                    ->modalHeading('Stack Trace')
                     ->modalDescription(fn (array $record): string => $record['message'])
-                    ->slideOver()
+                    ->slideOver(),
             ])
             ->poll(self::getPlugin()->getPollingTime())
             ->filters(
