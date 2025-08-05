@@ -1,5 +1,26 @@
 # Changelog
 
+## v1.1.1 - 2025-08-05
+
+### 🎉 New Features
+
+- feat: Tabs added to filter log level (#28) by @achyutkneupane
+- feat: Refresh Button added as header action (#30) by @achyutkneupane
+- feat: Pagination added in log table (#34) by @achyutkneupane
+
+### 🐛 Bug Fixes
+
+- fix: Stack Trace parsing issue fixed (#32) by @achyutkneupane
+
+### 🪚 Refactors
+
+- refactor: Log Level Tabs moved to Trait (#29) by @achyutkneupane
+- refactor: remove sushi and adapt for Filament v4 custom data (#31) by @achyutkneupane
+
+### 📚 Documentation Changes
+
+- docs: README for v4 updated (#33) by @achyutkneupane
+
 ## v1.1.0 - 2025-08-05
 
 ### 📚 Documentation Changes
