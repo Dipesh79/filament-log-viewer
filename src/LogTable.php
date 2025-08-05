@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AchyutN\FilamentLogViewer;
 
+use AchyutN\FilamentLogViewer\Enums\LogLevel;
 use AchyutN\FilamentLogViewer\Filters\DateRangeFilter;
 use AchyutN\FilamentLogViewer\Filters\LogLevelFilter;
 use AchyutN\FilamentLogViewer\Model\Log;
@@ -15,18 +16,23 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Panel;
+use Filament\Resources\Concerns\HasTabs;
+use Filament\Schemas\Components\EmbeddedTable;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Schema;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 final class LogTable extends Page implements HasTable
 {
     use InteractsWithTable;
+    use HasTabs;
 
     protected string $view = 'filament-log-viewer::log-table';
 
@@ -75,6 +81,11 @@ final class LogTable extends Page implements HasTable
             ->query(
                 Log::query()
             )
+            ->modifyQueryUsing(function (Builder $query): void {
+                if ($this->activeTab !== "all-logs" && filled($this->activeTab)) {
+                    $query->where('log_level', $this->activeTab);
+                }
+            })
             ->columns([
                 TextColumn::make('log_level')
                     ->badge(),
@@ -154,5 +165,32 @@ final class LogTable extends Page implements HasTable
     private static function getPlugin(): FilamentLogViewer
     {
         return filament('filament-log-viewer');
+    }
+
+    /** @return array<string, mixed> */
+    public function getTabs(): array
+    {
+        $all_logs = [
+            "all-logs" => Tab::make('All Logs')
+                ->id("all-logs")
+                ->badge(fn () => Log::query()->count() ?: null),
+        ];
+
+        $tabs = collect(LogLevel::cases())
+            ->mapWithKeys(fn (LogLevel $level) => [
+                $level->value => Tab::make($level->getLabel())
+                    ->id($level->value)
+                    ->badge(
+                        fn () => Log::query()->where('log_level', $level)->count() ?: null
+                    )
+                    ->badgeColor($level->getColor()),
+            ])->toArray();
+
+        return array_merge($all_logs, $tabs);
+    }
+
+    public function getActiveTab(): string
+    {
+        return "all-logs";
     }
 }
