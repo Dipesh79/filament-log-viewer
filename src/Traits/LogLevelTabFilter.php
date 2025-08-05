@@ -13,12 +13,27 @@ trait LogLevelTabFilter
 {
     use HasTabs;
 
+    public string $unscopedLogLevel = "all-logs";
+
+    /**
+     * @param string $tab
+     * @return bool
+     */
+    public function tabIsActive(string $tab): bool
+    {
+        if ($tab === $this->unscopedLogLevel) {
+            return $this->activeTab === null || $this->activeTab === $this->unscopedLogLevel;
+        }
+
+        return $this->activeTab === $tab;
+    }
+
     /** @return array<string, mixed> */
     public function getTabs(): array
     {
         $all_logs = [
-            'all-logs' => Tab::make('All Logs')
-                ->id('all-logs')
+            $this->unscopedLogLevel => Tab::make('All Logs')
+                ->id($this->unscopedLogLevel)
                 ->badge(fn () => Log::query()->count() ?: null),
         ];
 
@@ -37,6 +52,6 @@ trait LogLevelTabFilter
 
     public function getActiveTab(): string
     {
-        return 'all-logs';
+        return $this->unscopedLogLevel;
     }
 }
