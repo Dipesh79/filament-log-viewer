@@ -82,15 +82,15 @@ final class LogTable extends Page implements HasTable
                             return $log;
                         })
                         ->when(
-                            !$this->tableIsUnscoped(),
-                            fn(Collection $data): Collection => $data->where(
+                            ! $this->tableIsUnscoped(),
+                            fn (Collection $data): Collection => $data->where(
                                 'log_level',
                                 $this->activeTab
                             ),
                         )
                         ->when(
                             filled($filters['date']['from']),
-                            fn(Collection $data): Collection => $data->where(
+                            fn (Collection $data): Collection => $data->where(
                                 'date',
                                 '>=',
                                 $filters['date']['from']
@@ -98,7 +98,7 @@ final class LogTable extends Page implements HasTable
                         )
                         ->when(
                             filled($filters['date']['until']),
-                            fn(Collection $data): Collection => $data->where(
+                            fn (Collection $data): Collection => $data->where(
                                 'date',
                                 '<=',
                                 $filters['date']['until']
@@ -106,26 +106,27 @@ final class LogTable extends Page implements HasTable
                         )
                         ->when(
                             filled($sortColumn),
-                            fn(Collection $data): Collection => $data->sortBy(
+                            fn (Collection $data): Collection => $data->sortBy(
                                 $sortColumn,
                                 SORT_DESC,
                                 $sortDirection === 'desc',
                             ),
-                            fn(Collection $data): Collection => $data->sortByDesc(
+                            fn (Collection $data): Collection => $data->sortByDesc(
                                 'date'
                             )
                         )
                         ->when(
                             filled($search),
-                            fn(Collection $data): Collection => $data->filter(
-                                fn(array $log): bool => str_contains(
-                                    mb_strtolower((string)$log['message']),
-                                    mb_strtolower((string)$search)
+                            fn (Collection $data): Collection => $data->filter(
+                                fn (array $log): bool => str_contains(
+                                    mb_strtolower((string) $log['message']),
+                                    mb_strtolower((string) $search)
                                 )
                             )
                         );
                     $paginatedRecords = $records
                         ->forPage($page, $recordsPerPage);
+
                     return new LengthAwarePaginator(
                         $paginatedRecords,
                         total: count($records),
@@ -138,7 +139,7 @@ final class LogTable extends Page implements HasTable
                     ->badge(),
                 TextColumn::make('env')
                     ->label('Environment')
-                    ->color(fn(string $state): array => match ($state) {
+                    ->color(fn (string $state): array => match ($state) {
                         'local' => Color::Blue,
                         'production' => Color::Red,
                         'staging' => Color::Orange,
@@ -178,7 +179,7 @@ final class LogTable extends Page implements HasTable
                     ->modalSubmitAction(false)
                     ->modalCancelAction(false)
                     ->modalHeading('Stack Trace')
-                    ->modalDescription(fn(array $record): string => $record['message'])
+                    ->modalDescription(fn (array $record): string => $record['message'])
                     ->slideOver(),
             ])
             ->poll(self::getPlugin()->getPollingTime())
