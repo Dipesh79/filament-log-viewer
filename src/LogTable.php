@@ -74,7 +74,7 @@ final class LogTable extends Page implements HasTable
     {
         return $table
             ->records(
-                fn (?array $filters, ?string $sortColumn, ?string $sortDirection, ?string $search): Collection => collect(Log::getRows())
+                fn (?array $filters, ?string $sortColumn, ?string $sortDirection, ?string $search): Collection => Collection::wrap(Log::getRows())
                     ->when(
                         ! $this->tableIsUnscoped(),
                         fn (Collection $data): Collection => $data->where(
@@ -145,7 +145,9 @@ final class LogTable extends Page implements HasTable
                     ->dateTimeTooltip(),
             ])
             ->recordActions([
-                ViewAction::make('view')
+                Action::make('view')
+                    ->icon(Heroicon::Eye)
+                    ->color(Color::Gray)
                     ->schema([
                         RepeatableEntry::make('stack')
                             ->hiddenLabel()
