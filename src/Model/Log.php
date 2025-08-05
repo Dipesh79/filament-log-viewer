@@ -25,7 +25,7 @@ final class Log
         }
     }
 
-    /** @return string[] */
+    /** @return array<string, array<string, string>> */
     public static function getRows(): array
     {
         $logFilePath = storage_path('logs');
@@ -67,6 +67,32 @@ final class Log
         }
 
         return array_filter($logs);
+    }
+
+    public static function getLogsByLogLevel(string $logLevel = 'all-logs'): array
+    {
+        if ($logLevel === 'all-logs') {
+            return self::getRows();
+        }
+
+        $logLevelWise = [];
+        foreach (self::getRows() as $log) {
+            $logHasLogLevel = array_key_exists('log_level', $log) && $log['log_level'] instanceof LogLevel;
+            if ($logHasLogLevel && $log['log_level']->value === $logLevel) {
+                $logLevelWise[] = $log;
+            }
+        }
+
+        return $logLevelWise;
+    }
+
+    public static function getLogCount(string $logLevel = 'all-logs'): int
+    {
+        if ($logLevel === 'all-logs') {
+            return count(self::getRows());
+        }
+
+        return count(self::getLogsByLogLevel($logLevel));
     }
 
     protected function casts(): array

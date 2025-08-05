@@ -23,6 +23,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 final class LogTable extends Page implements HasTable
 {
@@ -73,8 +74,8 @@ final class LogTable extends Page implements HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(
-                Log::query()
+            ->records(
+                fn (?string $sortColumn, ?string $sortDirection): Collection => collect(Log::getRows())
             )
             ->modifyQueryUsing(function (Builder $query): void {
                 if (! $this->tableIsUnscoped()) {
@@ -147,7 +148,6 @@ final class LogTable extends Page implements HasTable
                     $this->refresh();
                 }),
             Action::make('clear')
-                ->visible(Log::query()->count() > 0)
                 ->label('Clear Logs')
                 ->icon(Heroicon::Trash)
                 ->color(Color::Red)
