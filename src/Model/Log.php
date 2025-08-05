@@ -5,24 +5,10 @@ declare(strict_types=1);
 namespace AchyutN\FilamentLogViewer\Model;
 
 use AchyutN\FilamentLogViewer\Enums\LogLevel;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pipeline\Pipeline;
-use Sushi\Sushi;
 
-final class Log extends Model
+final class Log
 {
-    use Sushi;
-
-    /** @var string[] */
-    protected array $schema = [
-        'log_level' => 'string',
-        'date' => 'datetime',
-        'env' => 'string',
-        'message' => 'string',
-        'file' => 'string',
-        'stack' => 'string',
-    ];
-
     public static function destroyAllLogs(): void
     {
         $logFilePath = storage_path('logs');
@@ -40,7 +26,7 @@ final class Log extends Model
     }
 
     /** @return string[] */
-    public function getRows(): array
+    public static function getRows(): array
     {
         $logFilePath = storage_path('logs');
         if (! is_dir($logFilePath)) {
@@ -69,14 +55,14 @@ final class Log extends Model
 
             foreach ($lines as $line) {
                 if (preg_match('/^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]/', $line) && $entryLines !== []) {
-                    $logs[] = $this->parseLogEntry($entryLines, $file);
+                    $logs[] = self::parseLogEntry($entryLines, $file);
                     $entryLines = [];
                 }
                 $entryLines[] = $line;
             }
 
             if ($entryLines !== []) {
-                $logs[] = $this->parseLogEntry($entryLines, $file);
+                $logs[] = self::parseLogEntry($entryLines, $file);
             }
         }
 
@@ -91,7 +77,7 @@ final class Log extends Model
         ];
     }
 
-    private function parseLogEntry(array $lines, string $file): ?array
+    private static function parseLogEntry(array $lines, string $file): ?array
     {
         $entry = implode("\n", $lines);
 
@@ -105,13 +91,13 @@ final class Log extends Model
             'date' => trim($matches['date']),
             'env' => trim($matches['env']),
             'log_level' => LogLevel::from(mb_strtolower(trim($matches['level']))),
-            'message' => $this->extractMessage($matches['message']),
-            'stack' => $this->extractStack($matches['message']),
+            'message' => self::extractMessage($matches['message']),
+            'stack' => self::extractStack($matches['message']),
             'file' => $file,
         ];
     }
 
-    private function extractMessage(string $raw): string
+    private static function extractMessage(string $raw): string
     {
         $split = preg_split('/\n|\{/', $raw, 2);
 
@@ -122,7 +108,7 @@ final class Log extends Model
         return trim($raw);
     }
 
-    private function extractStack(string $raw): string
+    private static function extractStack(string $raw): string
     {
         $stackTrace = app(Pipeline::class)
             ->send($raw)
