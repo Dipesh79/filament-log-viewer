@@ -9,6 +9,8 @@
 
 A Filament plugin to read and display Laravel log files in a clean, searchable table with stack traces and filtering.
 
+Refer to [version compatibility table](#filament-compatibility) below to ensure you are using the correct version of this package with your Filament installation.
+
 ## Installation
 
 ```bash

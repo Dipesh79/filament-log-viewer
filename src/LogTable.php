@@ -9,7 +9,6 @@ use AchyutN\FilamentLogViewer\Model\Log;
 use AchyutN\FilamentLogViewer\Traits\LogLevelTabFilter;
 use Exception;
 use Filament\Actions\Action;
-use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
@@ -74,7 +73,12 @@ final class LogTable extends Page implements HasTable
     {
         return $table
             ->records(
-                fn (?array $filters, ?string $sortColumn, ?string $sortDirection, ?string $search): Collection => collect(Log::getRows())
+                fn (?array $filters, ?string $sortColumn, ?string $sortDirection, ?string $search): Collection => Collection::wrap(Log::getRows())
+                    ->map(function (array $log): array {
+                        $log['stack'] = json_decode($log['stack'] ?? []);
+
+                        return $log;
+                    })
                     ->when(
                         ! $this->tableIsUnscoped(),
                         fn (Collection $data): Collection => $data->where(
@@ -102,20 +106,22 @@ final class LogTable extends Page implements HasTable
                         filled($sortColumn),
                         fn (Collection $data): Collection => $data->sortBy(
                             $sortColumn,
-                            SORT_REGULAR,
+                            SORT_DESC,
                             $sortDirection === 'desc',
+                        ),
+                        fn (Collection $data): Collection => $data->sortByDesc(
+                            'date'
                         )
                     )
                     ->when(
                         filled($search),
                         fn (Collection $data): Collection => $data->filter(
                             fn (array $log): bool => str_contains(
-                                mb_strtolower($log['message']),
+                                mb_strtolower((string) $log['message']),
                                 mb_strtolower((string) $search)
                             )
                         )
-                    )
-            )
+                    ))
             ->columns([
                 TextColumn::make('log_level')
                     ->badge(),
@@ -145,7 +151,9 @@ final class LogTable extends Page implements HasTable
                     ->dateTimeTooltip(),
             ])
             ->recordActions([
-                ViewAction::make('view')
+                Action::make('view')
+                    ->icon(Heroicon::Eye)
+                    ->color(Color::Gray)
                     ->schema([
                         RepeatableEntry::make('stack')
                             ->hiddenLabel()
@@ -156,6 +164,10 @@ final class LogTable extends Page implements HasTable
                             ])
                             ->label('Stack Trace'),
                     ])
+                    ->modalSubmitAction(false)
+                    ->modalCancelAction(false)
+                    ->modalHeading('Stack Trace')
+                    ->modalDescription(fn (array $record): string => $record['message'])
                     ->slideOver(),
             ])
             ->poll(self::getPlugin()->getPollingTime())
@@ -167,8 +179,7 @@ final class LogTable extends Page implements HasTable
             ->filtersFormWidth(Width::ExtraLarge)
             ->filtersFormColumns(1)
             ->deferFilters(false)
-            ->deferColumnManager(false)
-            ->defaultSort('date', 'desc');
+            ->deferColumnManager(false);
     }
 
     protected function getHeaderActions(): array
