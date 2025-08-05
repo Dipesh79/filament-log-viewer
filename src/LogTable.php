@@ -75,7 +75,7 @@ final class LogTable extends Page implements HasTable
     {
         return $table
             ->records(
-                fn (?array $filters, ?string $sortColumn, ?string $sortDirection): Collection => collect(Log::getRows())
+                fn (?array $filters, ?string $sortColumn, ?string $sortDirection, ?string $search): Collection => collect(Log::getRows())
                     ->when(
                         ! $this->tableIsUnscoped(),
                         fn (Collection $data): Collection => $data->where(
@@ -107,6 +107,15 @@ final class LogTable extends Page implements HasTable
                             $sortDirection === 'desc',
                         )
                     )
+                    ->when(
+                            filled($search),
+                            fn (Collection $data): Collection => $data->filter(
+                                fn (array $log): bool => str_contains(
+                                    mb_strtolower($log['message']),
+                                    mb_strtolower($search)
+                                )
+                            )
+                        )
             )
             ->columns([
                 TextColumn::make('log_level')
@@ -128,6 +137,7 @@ final class LogTable extends Page implements HasTable
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('message')
                     ->label('Summary')
+                    ->searchable()
                     ->wrap(),
                 TextColumn::make('date')
                     ->label('Occurred')
