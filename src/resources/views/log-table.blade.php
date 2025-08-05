@@ -1,4 +1,5 @@
 <x-filament-panels::page>
+
     <x-filament::tabs>
         @foreach($this->getCachedTabs() as $tab)
             <x-filament::tabs.item
@@ -11,5 +12,6 @@
             </x-filament::tabs.item>
         @endforeach
     </x-filament::tabs>
+
     {{ $this->table }}
 </x-filament-panels::page>
