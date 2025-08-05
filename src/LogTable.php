@@ -102,8 +102,11 @@ final class LogTable extends Page implements HasTable
                         filled($sortColumn),
                         fn (Collection $data): Collection => $data->sortBy(
                             $sortColumn,
-                            SORT_REGULAR,
-                            $sortDirection === 'desc',
+                            SORT_DESC,
+                            $sortDirection === "desc",
+                        ),
+                        fn (Collection $data): Collection => $data->sortByDesc(
+                            'date'
                         )
                     )
                     ->when(
@@ -169,8 +172,7 @@ final class LogTable extends Page implements HasTable
             ->filtersFormWidth(Width::ExtraLarge)
             ->filtersFormColumns(1)
             ->deferFilters(false)
-            ->deferColumnManager(false)
-            ->defaultSort('date', 'desc');
+            ->deferColumnManager(false);
     }
 
     protected function getHeaderActions(): array
