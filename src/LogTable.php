@@ -131,7 +131,6 @@ final class LogTable extends Page implements HasTable
             ->poll(self::getPlugin()->getPollingTime())
             ->filters(
                 [
-                    LogLevelFilter::make(),
                     DateRangeFilter::make('date'),
                 ]
             )
