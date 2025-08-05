@@ -40,7 +40,7 @@ After installation, visit `/logs` in your Filament panel. You will see a table o
 - **Message** – Short summary of the log
 - **Occurred** – Human-readable date/time
 
-![Table Preview](https://hamrocdn.com/uryCX6dM652b)
+![Table Preview](https://hamrocdn.com/4WCWYgw7EPjB)
 
 Click the view action to inspect stack traces.
 
