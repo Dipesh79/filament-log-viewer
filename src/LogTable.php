@@ -75,13 +75,15 @@ final class LogTable extends Page implements HasTable
     {
         return $table
             ->records(
-                fn (?string $sortColumn, ?string $sortDirection): Collection => collect(Log::getRows())
+                fn (?array $filters): Collection => collect(Log::getRows())
+                    ->when(
+                        ! $this->tableIsUnscoped(),
+                        fn (Collection $data): Collection => $data->where(
+                            'log_level',
+                            $this->activeTab
+                        ),
+                    )
             )
-            ->modifyQueryUsing(function (Builder $query): void {
-                if (! $this->tableIsUnscoped()) {
-                    $query->where('log_level', $this->activeTab);
-                }
-            })
             ->columns([
                 TextColumn::make('log_level')
                     ->badge(),
@@ -101,14 +103,12 @@ final class LogTable extends Page implements HasTable
                     ->badge()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('message')
-                    ->searchable()
                     ->label('Summary')
                     ->wrap(),
                 TextColumn::make('date')
                     ->label('Occurred')
                     ->since()
-                    ->dateTimeTooltip()
-                    ->sortable(),
+                    ->dateTimeTooltip(),
             ])
             ->recordActions([
                 ViewAction::make('view')

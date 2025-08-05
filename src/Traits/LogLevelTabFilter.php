@@ -35,16 +35,16 @@ trait LogLevelTabFilter
         $all_logs = [
             $this->unscopedLogLevel => Tab::make('All Logs')
                 ->id($this->unscopedLogLevel)
-//                ->badge(fn () => Log::query()->count() ?: null),
+                ->badge(fn () => Log::getLogCount() ?: null),
         ];
 
         $tabs = collect(LogLevel::cases())
             ->mapWithKeys(fn (LogLevel $level) => [
                 $level->value => Tab::make($level->getLabel())
                     ->id($level->value)
-//                    ->badge(
-//                        fn () => Log::query()->where('log_level', $level)->count() ?: null
-//                    )
+                    ->badge(
+                        fn () => Log::getLogCount($level->value) ?: null,
+                    )
                     ->badgeColor($level->getColor()),
             ])->toArray();
 
