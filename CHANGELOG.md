@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.0 - 2025-08-05
+
+### 📚 Documentation Changes
+
+- docs: Readme with versions for v1 (#26) by @achyutkneupane
+
 ## v1.0.0 - 2025-08-04
 
 ### 🎉 New Features
