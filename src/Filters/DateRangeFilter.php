@@ -9,7 +9,6 @@ use Exception;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\Indicator;
-use Illuminate\Database\Eloquent\Builder;
 
 final class DateRangeFilter
 {

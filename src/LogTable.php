@@ -22,7 +22,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 final class LogTable extends Page implements HasTable
@@ -108,14 +107,14 @@ final class LogTable extends Page implements HasTable
                         )
                     )
                     ->when(
-                            filled($search),
-                            fn (Collection $data): Collection => $data->filter(
-                                fn (array $log): bool => str_contains(
-                                    mb_strtolower($log['message']),
-                                    mb_strtolower($search)
-                                )
+                        filled($search),
+                        fn (Collection $data): Collection => $data->filter(
+                            fn (array $log): bool => str_contains(
+                                mb_strtolower($log['message']),
+                                mb_strtolower((string) $search)
                             )
                         )
+                    )
             )
             ->columns([
                 TextColumn::make('log_level')

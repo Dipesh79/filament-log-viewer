@@ -95,14 +95,6 @@ final class Log
         return count(self::getLogsByLogLevel($logLevel));
     }
 
-    protected function casts(): array
-    {
-        return [
-            'log_level' => LogLevel::class,
-            'stack' => 'json',
-        ];
-    }
-
     private static function parseLogEntry(array $lines, string $file): ?array
     {
         $entry = implode("\n", $lines);
