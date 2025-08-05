@@ -139,6 +139,13 @@ final class LogTable extends Page implements HasTable
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('refresh')
+                ->label('Refresh')
+                ->icon(Heroicon::ArrowPath)
+                ->outlined()
+                ->action(function (): void {
+                    $this->refresh();
+                }),
             Action::make('clear')
                 ->visible(Log::query()->count() > 0)
                 ->label('Clear Logs')
