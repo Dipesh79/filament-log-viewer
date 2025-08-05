@@ -21,6 +21,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 final class LogTable extends Page implements HasTable
@@ -73,55 +74,66 @@ final class LogTable extends Page implements HasTable
     {
         return $table
             ->records(
-                fn (?array $filters, ?string $sortColumn, ?string $sortDirection, ?string $search): Collection => Collection::wrap(Log::getRows())
-                    ->map(function (array $log): array {
-                        $log['stack'] = json_decode($log['stack'] ?? []);
+                function (?array $filters, ?string $sortColumn, ?string $sortDirection, ?string $search, int $page, int $recordsPerPage): LengthAwarePaginator {
+                    $records = Collection::wrap(Log::getRows())
+                        ->map(function (array $log): array {
+                            $log['stack'] = json_decode($log['stack'] ?? []);
 
-                        return $log;
-                    })
-                    ->when(
-                        ! $this->tableIsUnscoped(),
-                        fn (Collection $data): Collection => $data->where(
-                            'log_level',
-                            $this->activeTab
-                        ),
-                    )
-                    ->when(
-                        filled($filters['date']['from']),
-                        fn (Collection $data): Collection => $data->where(
-                            'date',
-                            '>=',
-                            $filters['date']['from']
+                            return $log;
+                        })
+                        ->when(
+                            ! $this->tableIsUnscoped(),
+                            fn (Collection $data): Collection => $data->where(
+                                'log_level',
+                                $this->activeTab
+                            ),
                         )
-                    )
-                    ->when(
-                        filled($filters['date']['until']),
-                        fn (Collection $data): Collection => $data->where(
-                            'date',
-                            '<=',
-                            $filters['date']['until']
-                        )
-                    )
-                    ->when(
-                        filled($sortColumn),
-                        fn (Collection $data): Collection => $data->sortBy(
-                            $sortColumn,
-                            SORT_DESC,
-                            $sortDirection === 'desc',
-                        ),
-                        fn (Collection $data): Collection => $data->sortByDesc(
-                            'date'
-                        )
-                    )
-                    ->when(
-                        filled($search),
-                        fn (Collection $data): Collection => $data->filter(
-                            fn (array $log): bool => str_contains(
-                                mb_strtolower((string) $log['message']),
-                                mb_strtolower((string) $search)
+                        ->when(
+                            filled($filters['date']['from']),
+                            fn (Collection $data): Collection => $data->where(
+                                'date',
+                                '>=',
+                                $filters['date']['from']
                             )
                         )
-                    ))
+                        ->when(
+                            filled($filters['date']['until']),
+                            fn (Collection $data): Collection => $data->where(
+                                'date',
+                                '<=',
+                                $filters['date']['until']
+                            )
+                        )
+                        ->when(
+                            filled($sortColumn),
+                            fn (Collection $data): Collection => $data->sortBy(
+                                $sortColumn,
+                                SORT_DESC,
+                                $sortDirection === 'desc',
+                            ),
+                            fn (Collection $data): Collection => $data->sortByDesc(
+                                'date'
+                            )
+                        )
+                        ->when(
+                            filled($search),
+                            fn (Collection $data): Collection => $data->filter(
+                                fn (array $log): bool => str_contains(
+                                    mb_strtolower((string) $log['message']),
+                                    mb_strtolower((string) $search)
+                                )
+                            )
+                        );
+                    $paginatedRecords = $records
+                        ->forPage($page, $recordsPerPage);
+
+                    return new LengthAwarePaginator(
+                        $paginatedRecords,
+                        total: count($records),
+                        perPage: $recordsPerPage,
+                        currentPage: $page,
+                    );
+                })
             ->columns([
                 TextColumn::make('log_level')
                     ->badge(),
