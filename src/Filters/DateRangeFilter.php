@@ -9,7 +9,6 @@ use Exception;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\Indicator;
-use Illuminate\Database\Eloquent\Builder;
 
 final class DateRangeFilter
 {
@@ -26,15 +25,6 @@ final class DateRangeFilter
                     ->label('Until'),
             ])
             ->columns()
-            ->query(fn (Builder $query, array $data): Builder => $query
-                ->when(
-                    $data['from'],
-                    fn (Builder $query, $date): Builder => $query->whereDate($name, '>=', $date),
-                )
-                ->when(
-                    $data['until'],
-                    fn (Builder $query, $date): Builder => $query->whereDate($name, '<=', $date),
-                ))
             ->indicateUsing(
                 fn (array $data): array => self::indicators($data),
             );

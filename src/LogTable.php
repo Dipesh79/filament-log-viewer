@@ -22,7 +22,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 final class LogTable extends Page implements HasTable
 {
@@ -73,14 +73,49 @@ final class LogTable extends Page implements HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(
-                Log::query()
+            ->records(
+                fn (?array $filters, ?string $sortColumn, ?string $sortDirection, ?string $search): Collection => collect(Log::getRows())
+                    ->when(
+                        ! $this->tableIsUnscoped(),
+                        fn (Collection $data): Collection => $data->where(
+                            'log_level',
+                            $this->activeTab
+                        ),
+                    )
+                    ->when(
+                        filled($filters['date']['from']),
+                        fn (Collection $data): Collection => $data->where(
+                            'date',
+                            '>=',
+                            $filters['date']['from']
+                        )
+                    )
+                    ->when(
+                        filled($filters['date']['until']),
+                        fn (Collection $data): Collection => $data->where(
+                            'date',
+                            '<=',
+                            $filters['date']['until']
+                        )
+                    )
+                    ->when(
+                        filled($sortColumn),
+                        fn (Collection $data): Collection => $data->sortBy(
+                            $sortColumn,
+                            SORT_REGULAR,
+                            $sortDirection === 'desc',
+                        )
+                    )
+                    ->when(
+                        filled($search),
+                        fn (Collection $data): Collection => $data->filter(
+                            fn (array $log): bool => str_contains(
+                                mb_strtolower($log['message']),
+                                mb_strtolower((string) $search)
+                            )
+                        )
+                    )
             )
-            ->modifyQueryUsing(function (Builder $query): void {
-                if (! $this->tableIsUnscoped()) {
-                    $query->where('log_level', $this->activeTab);
-                }
-            })
             ->columns([
                 TextColumn::make('log_level')
                     ->badge(),
@@ -100,14 +135,14 @@ final class LogTable extends Page implements HasTable
                     ->badge()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('message')
-                    ->searchable()
                     ->label('Summary')
+                    ->searchable()
                     ->wrap(),
                 TextColumn::make('date')
                     ->label('Occurred')
                     ->since()
-                    ->dateTimeTooltip()
-                    ->sortable(),
+                    ->sortable()
+                    ->dateTimeTooltip(),
             ])
             ->recordActions([
                 ViewAction::make('view')
@@ -147,7 +182,6 @@ final class LogTable extends Page implements HasTable
                     $this->refresh();
                 }),
             Action::make('clear')
-                ->visible(Log::query()->count() > 0)
                 ->label('Clear Logs')
                 ->icon(Heroicon::Trash)
                 ->color(Color::Red)
