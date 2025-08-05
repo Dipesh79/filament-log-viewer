@@ -154,7 +154,6 @@ final class LogTable extends Page implements HasTable
                 Action::make('view')
                     ->icon(Heroicon::Eye)
                     ->color(Color::Gray)
-                    ->before(fn ($record) => dd($record))
                     ->schema([
                         RepeatableEntry::make('stack')
                             ->hiddenLabel()
@@ -165,7 +164,11 @@ final class LogTable extends Page implements HasTable
                             ])
                             ->label('Stack Trace'),
                     ])
-                    ->slideOver(),
+                    ->modalSubmitAction(false)
+                    ->modalCancelAction(false)
+                    ->modalHeading("Stack Trace")
+                    ->modalDescription(fn (array $record): string => $record['message'])
+                    ->slideOver()
             ])
             ->poll(self::getPlugin()->getPollingTime())
             ->filters(
