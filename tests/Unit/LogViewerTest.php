@@ -181,3 +181,25 @@ describe('getLogsByLogLevel', function () {
         expect($logs)->toBeEmpty();
     });
 });
+
+describe('getLogCount', function () {
+    it('returns the total count of logs', function () {
+        $count = Log::getLogCount();
+
+        expect($count)->toBe(4);
+    });
+
+    it('returns zero if no log files exist', function () {
+        collect(glob(storage_path('logs/*')))->each(fn ($file) => unlink($file));
+
+        $count = Log::getLogCount();
+
+        expect($count)->toBe(0);
+    });
+
+    it('returns zero if no logs match the log level', function () {
+        $count = Log::getLogCount('debug');
+
+        expect($count)->toBe(0);
+    });
+});
