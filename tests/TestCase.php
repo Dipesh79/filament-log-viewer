@@ -6,6 +6,7 @@ namespace AchyutN\FilamentLogViewer\Tests;
 
 use AchyutN\FilamentLogViewer\LogViewerProvider;
 use AchyutN\FilamentLogViewer\Tests\Providers\TestPanelProvider;
+use AllowDynamicProperties;
 use BladeUI\Heroicons\BladeHeroiconsServiceProvider;
 use BladeUI\Icons\BladeIconsServiceProvider;
 use Filament\Actions\ActionsServiceProvider;
@@ -17,6 +18,7 @@ use Filament\Schemas\SchemasServiceProvider;
 use Filament\Support\SupportServiceProvider;
 use Filament\Tables\TablesServiceProvider;
 use Filament\Widgets\WidgetsServiceProvider;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Log\LogServiceProvider;
 use Livewire\LivewireServiceProvider;
@@ -24,10 +26,18 @@ use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use RyanChandler\BladeCaptureDirective\BladeCaptureDirectiveServiceProvider;
 
+#[AllowDynamicProperties]
 abstract class TestCase extends BaseTestCase
 {
     use LazilyRefreshDatabase;
     use WithWorkbench;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->setUpDatabase();
+    }
 
     protected function getPackageProviders($app): array
     {
@@ -103,5 +113,20 @@ abstract class TestCase extends BaseTestCase
                 unlink($file);
             }
         });
+    }
+
+    protected function setUpDatabase(): void
+    {
+        app('db')->connection()->getSchemaBuilder()->table('users', function (Blueprint $blueprint) {
+            $blueprint->enum('role', ['admin', 'user'])->default('user');
+        });
+
+        $this->testUser = Model\User::query()
+            ->create([
+                'name' => 'Admin User',
+                'email' => 'admin@achyut.com.np',
+                'password' => bcrypt('password'),
+                'role' => 'user',
+            ]);
     }
 }
