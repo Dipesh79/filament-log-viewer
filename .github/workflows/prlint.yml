@@ -34,7 +34,7 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: ${{ matrix.php }}
-                    extensions: json, dom, curl, libxml, mbstring, sqlite
+                    extensions: json, dom, curl, libxml, mbstring
                     coverage: xdebug
 
             -   name: "Install Composer Dependencies"
