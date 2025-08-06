@@ -41,9 +41,13 @@ final class FilamentLogViewer implements Plugin
             ]);
     }
 
+    /**
+     * @param Panel $panel
+     * @return void
+     */
     public function boot(Panel $panel): void
     {
-        //
+        // This plugin doesn't require boot-time logic for now.
     }
 
     public function authorize(bool|Closure $callback): self
