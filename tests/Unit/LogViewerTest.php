@@ -138,3 +138,46 @@ describe('getRows', function () {
         expect($logs)->not->toContain(fn ($log) => $log['file'] === 'not-a-log.txt');
     });
 });
+
+describe('getLogsByLogLevel', function () {
+    it('returns all logs when log level is "all-logs"', function () {
+        $logs = Log::getLogsByLogLevel();
+
+        expect($logs)->toBeArray();
+        expect($logs)->toHaveCount(4);
+    });
+
+    it('returns logs filtered by log level', function () {
+        $errorLogs = Log::getLogsByLogLevel('info');
+
+        expect($errorLogs)->toBeArray();
+        expect($errorLogs)->toHaveCount(1);
+        expect($errorLogs)
+            ->each
+            ->toHaveKey('date')
+            ->toHaveKey('env')
+            ->toHaveKey('log_level')
+            ->toHaveKey('message')
+            ->toHaveKey('stack')
+            ->toHaveKey('file');
+        expect($errorLogs)
+            ->sequence(
+                function ($log) {
+                    return $log
+                        ->date->toBe('2024-08-06 20:16:00')
+                        ->env->toBe('local')
+                        ->log_level->tobe(AchyutN\FilamentLogViewer\Enums\LogLevel::INFO)
+                        ->message->toBe('Another log')
+                        ->stack->toBeNull()
+                        ->file->toBe('other.log');
+                }
+            );
+    });
+
+    it('returns an empty array if no logs match the log level', function () {
+        $logs = Log::getLogsByLogLevel('debug');
+
+        expect($logs)->toBeArray();
+        expect($logs)->toBeEmpty();
+    });
+});
