@@ -32,38 +32,42 @@ final class Log
         if (! is_dir($logFilePath)) {
             return [];
         }
-        $files = scandir($logFilePath);
 
         $logs = [];
 
-        foreach ($files as $file) {
+        foreach (scandir($logFilePath) as $file) {
             $filePath = $logFilePath.'/'.$file;
-            if (! is_file($filePath)) {
-                continue;
-            }
-            if (pathinfo($file, PATHINFO_EXTENSION) !== 'log') {
+            if (! is_file($filePath) || pathinfo($file, PATHINFO_EXTENSION) !== 'log') {
                 continue;
             }
 
-            $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            $logs = array_merge($logs, self::processLogFile($filePath, $file));
+        }
 
-            if ($lines === false) {
-                continue;
-            }
+        return array_filter($logs);
+    }
 
-            $entryLines = [];
+    private static function processLogFile(string $filePath, string $file): array
+    {
+        $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
-            foreach ($lines as $line) {
-                if (preg_match('/^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]/', $line) && $entryLines !== []) {
-                    $logs[] = self::parseLogEntry($entryLines, $file);
-                    $entryLines = [];
-                }
-                $entryLines[] = $line;
-            }
+        if ($lines === false) {
+            return [];
+        }
 
-            if ($entryLines !== []) {
+        $logs = [];
+        $entryLines = [];
+
+        foreach ($lines as $line) {
+            if (preg_match('/^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]/', $line) && $entryLines !== []) {
                 $logs[] = self::parseLogEntry($entryLines, $file);
+                $entryLines = [];
             }
+            $entryLines[] = $line;
+        }
+
+        if ($entryLines !== []) {
+            $logs[] = self::parseLogEntry($entryLines, $file);
         }
 
         return array_filter($logs);
@@ -117,7 +121,7 @@ final class Log
 
     private static function extractMessage(string $raw): string
     {
-        $split = preg_split('/\n|\{/', $raw, 2);
+        $split = preg_split('/[\n{]/', $raw, 2);
 
         if (is_array($split) && isset($split[0])) {
             return trim($split[0]);
