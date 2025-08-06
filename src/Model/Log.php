@@ -37,37 +37,14 @@ final class Log
 
         foreach (scandir($logFilePath) as $file) {
             $filePath = $logFilePath.'/'.$file;
-            if (! is_file($filePath) || pathinfo($file, PATHINFO_EXTENSION) !== 'log') {
+            if (! is_file($filePath)) {
+                continue;
+            }
+            if (pathinfo($file, PATHINFO_EXTENSION) !== 'log') {
                 continue;
             }
 
             $logs = array_merge($logs, self::processLogFile($filePath, $file));
-        }
-
-        return array_filter($logs);
-    }
-
-    private static function processLogFile(string $filePath, string $file): array
-    {
-        $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-
-        if ($lines === false) {
-            return [];
-        }
-
-        $logs = [];
-        $entryLines = [];
-
-        foreach ($lines as $line) {
-            if (preg_match('/^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]/', $line) && $entryLines !== []) {
-                $logs[] = self::parseLogEntry($entryLines, $file);
-                $entryLines = [];
-            }
-            $entryLines[] = $line;
-        }
-
-        if ($entryLines !== []) {
-            $logs[] = self::parseLogEntry($entryLines, $file);
         }
 
         return array_filter($logs);
@@ -97,6 +74,32 @@ final class Log
         }
 
         return count(self::getLogsByLogLevel($logLevel));
+    }
+
+    private static function processLogFile(string $filePath, string $file): array
+    {
+        $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+        if ($lines === false) {
+            return [];
+        }
+
+        $logs = [];
+        $entryLines = [];
+
+        foreach ($lines as $line) {
+            if (preg_match('/^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]/', $line) && $entryLines !== []) {
+                $logs[] = self::parseLogEntry($entryLines, $file);
+                $entryLines = [];
+            }
+            $entryLines[] = $line;
+        }
+
+        if ($entryLines !== []) {
+            $logs[] = self::parseLogEntry($entryLines, $file);
+        }
+
+        return array_filter($logs);
     }
 
     private static function parseLogEntry(array $lines, string $file): ?array
