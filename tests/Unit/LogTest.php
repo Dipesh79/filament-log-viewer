@@ -69,7 +69,7 @@ describe('getRows', function () {
                         ->env->toBe('local')
                         ->log_level->tobe(AchyutN\FilamentLogViewer\Enums\LogLevel::ERROR)
                         ->message->toBe('Sample log')
-                        ->stack->toBeNull()
+                        ->stack->toBe('[]')
                         ->file->toBe('laravel.log');
                 },
                 function ($log) {
@@ -78,7 +78,7 @@ describe('getRows', function () {
                         ->env->toBe('local')
                         ->log_level->tobe(AchyutN\FilamentLogViewer\Enums\LogLevel::INFO)
                         ->message->toBe('Another log')
-                        ->stack->toBeNull()
+                        ->stack->toBe('[]')
                         ->file->toBe('other.log');
                 },
                 function ($log) {
@@ -148,7 +148,7 @@ describe('getLogsByLogLevel', function () {
                         ->env->toBe('local')
                         ->log_level->tobe(AchyutN\FilamentLogViewer\Enums\LogLevel::INFO)
                         ->message->toBe('Another log')
-                        ->stack->toBeNull()
+                        ->stack->toBe('[]')
                         ->file->toBe('other.log');
                 }
             );

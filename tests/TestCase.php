@@ -46,8 +46,8 @@ abstract class TestCase extends BaseTestCase
             TablesServiceProvider::class,
             WidgetsServiceProvider::class,
             LogViewerProvider::class,
-            TestPanelProvider::class,
             SchemasServiceProvider::class,
+            TestPanelProvider::class,
         ];
 
         sort($providers);

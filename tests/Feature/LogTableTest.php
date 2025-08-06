@@ -1,12 +1,42 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AchyutN\FilamentLogViewer\Tests\Feature;
 
 use AchyutN\FilamentLogViewer\LogTable;
+
 use function Pest\Livewire\livewire;
 
-it('renders log table', function () {
-    livewire(LogTable::class)
-        ->assertSuccessful()
-        ->assertSee('Log Table');
+beforeEach(function () {
+    $this->panel = filament()->getPanel('admin');
+    $this->plugin = filament('filament-log-viewer');
+
+    $this->initializeLogs();
+});
+
+describe('renders fine', function () {
+    it('renders successfully', function () {
+        livewire(LogTable::class, ['panel' => $this->panel])
+            ->assertSuccessful()
+            ->assertSee('Log Table');
+    });
+
+    it('has actions', function () {
+        livewire(LogTable::class, ['panel' => $this->panel])
+            ->assertActionExists('refresh')
+            ->assertActionExists('clear');
+    });
+
+    it('has table columns', function () {
+        livewire(LogTable::class, ['panel' => $this->panel])
+            ->assertTableColumnExists('date')
+            ->assertTableColumnExists('log_level')
+            ->assertTableColumnExists('message');
+    });
+
+    it('has table filters', function () {
+        livewire(LogTable::class, ['panel' => $this->panel])
+            ->assertTableFilterExists('date');
+    });
 });
