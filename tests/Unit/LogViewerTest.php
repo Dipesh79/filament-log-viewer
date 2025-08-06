@@ -130,4 +130,11 @@ describe('getRows', function () {
         expect($logs)->toBeArray();
         expect($logs)->toBeEmpty();
     });
+
+    it('skips non-log files', function () {
+        $logs = Log::getRows();
+
+        expect($logs)->toHaveCount(4);
+        expect($logs)->not->toContain(fn ($log) => $log['file'] === 'not-a-log.txt');
+    });
 });
