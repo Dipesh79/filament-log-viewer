@@ -40,3 +40,11 @@ it('allows customization of navigation group', function () {
         ->assertSuccessful()
         ->assertSee('Custom Group');
 });
+
+it('shows log viewer UI with tabs', function () {
+    $this->get($this->plugin->getNavigationUrl())
+        ->assertSuccessful()
+        ->assertSee('All Logs')
+        ->assertSee('fi-badge')
+        ->assertSee('fi-active');
+});
