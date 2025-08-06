@@ -29,7 +29,7 @@ beforeEach(function () {
 });
 
 afterEach(function () {
-    collect(glob(storage_path('logs/*')))->each(fn ($file) => unlink($file));
+    $this->deleteAllLogs();
 });
 
 describe('log files', function () {
@@ -61,7 +61,7 @@ describe('destroyAllLogs', function () {
     });
 
     it('does nothing if log folder does not exist', function () {
-        collect(glob(storage_path('logs/*')))->each(fn ($file) => unlink($file));
+        $this->deleteAllLogs();
 
         expect(fn () => Log::destroyAllLogs())->not->toThrow(Exception::class);
     });
@@ -123,7 +123,7 @@ describe('getRows', function () {
     });
 
     it('returns an empty array if no log files exist', function () {
-        collect(glob(storage_path('logs/*')))->each(fn ($file) => unlink($file));
+        $this->deleteAllLogs();
 
         $logs = Log::getRows();
 
@@ -190,7 +190,7 @@ describe('getLogCount', function () {
     });
 
     it('returns zero if no log files exist', function () {
-        collect(glob(storage_path('logs/*')))->each(fn ($file) => unlink($file));
+        $this->deleteAllLogs();
 
         $count = Log::getLogCount();
 

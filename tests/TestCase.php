@@ -12,4 +12,13 @@ abstract class TestCase extends BaseTestCase
     {
         file_put_contents(storage_path("logs/{$filename}"), $content);
     }
+
+    protected function deleteAllLogs(): void
+    {
+        collect(glob(storage_path('logs/*')))->each(function ($file) {
+            if (is_file($file)) {
+                unlink($file);
+            }
+        });
+    }
 }
