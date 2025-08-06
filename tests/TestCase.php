@@ -4,13 +4,96 @@ declare(strict_types=1);
 
 namespace AchyutN\FilamentLogViewer\Tests;
 
+use AchyutN\FilamentLogViewer\LogViewerProvider;
+use AchyutN\FilamentLogViewer\Tests\Providers\TestPanelProvider;
+use BladeUI\Heroicons\BladeHeroiconsServiceProvider;
+use BladeUI\Icons\BladeIconsServiceProvider;
+use Filament\Actions\ActionsServiceProvider;
+use Filament\FilamentServiceProvider;
+use Filament\Forms\FormsServiceProvider;
+use Filament\Infolists\InfolistsServiceProvider;
+use Filament\Notifications\NotificationsServiceProvider;
+use Filament\Schemas\SchemasServiceProvider;
+use Filament\Support\SupportServiceProvider;
+use Filament\Tables\TablesServiceProvider;
+use Filament\Widgets\WidgetsServiceProvider;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Log\LogServiceProvider;
+use Livewire\LivewireServiceProvider;
+use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use RyanChandler\BladeCaptureDirective\BladeCaptureDirectiveServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
+    use LazilyRefreshDatabase;
+    use WithWorkbench;
+
+    protected function getPackageProviders($app): array
+    {
+        $providers = [
+            ActionsServiceProvider::class,
+            LogServiceProvider::class,
+            BladeCaptureDirectiveServiceProvider::class,
+            BladeHeroiconsServiceProvider::class,
+            BladeIconsServiceProvider::class,
+            FilamentServiceProvider::class,
+            FormsServiceProvider::class,
+            InfolistsServiceProvider::class,
+            LivewireServiceProvider::class,
+            NotificationsServiceProvider::class,
+            SupportServiceProvider::class,
+            TablesServiceProvider::class,
+            WidgetsServiceProvider::class,
+            LogViewerProvider::class,
+            TestPanelProvider::class,
+            SchemasServiceProvider::class,
+        ];
+
+        sort($providers);
+
+        return $providers;
+    }
+
+    protected function defineEnvironment($app): void
+    {
+        config()->set('database.connections.the_test', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
+        config()->set('database.default', 'the_test');
+        config()->set('app.key', 'base64:Hupx3yAySikrM2/edkZQNQHslgDWYfiBfCuSThJ5SK8=');
+    }
+
     protected function writeLog(string $filename, string $content): void
     {
         file_put_contents(storage_path("logs/{$filename}"), $content);
+    }
+
+    protected function initializeLogs(): void
+    {
+        if (! is_dir(storage_path('logs'))) {
+            mkdir(storage_path('logs'), 0755, true);
+        }
+
+        $this->writeLog('laravel.log', '[2024-08-06 20:15:00] local.ERROR: Sample log');
+        $this->writeLog('other.log', '[2024-08-06 20:16:00] local.INFO: Another log');
+        $this->writeLog('not-a-log.txt', 'This is not a log');
+
+        $stackTraces = [
+            '[2024-08-06 20:17:00] local.ERROR: Sample log with stack trace at /path/to/file.php:123',
+            '[stacktrace]',
+            '#0 /path/to/another_file.php(456): someFunction()',
+            '#1 {main}',
+            '"}',
+            '[2024-08-06 20:18:00] local.ERROR: Another log with stack trace at /path/to/another_file.php:789',
+            '[stacktrace]',
+            '#0 /path/to/yet_another_file.php(101): anotherFunction()',
+            '#1 {main}',
+            '"}',
+        ];
+        $this->writeLog('stack-trace.log', implode("\n", $stackTraces));
     }
 
     protected function deleteAllLogs(): void
