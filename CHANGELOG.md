@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1.3 - 2025-08-06
+
+### 🏗️ Build System
+
+- ci: Tests now generate coverage and and run sonarqube (#36) by @achyutkneupane
+- ci: Coverage will be generated as clover XML (#38) by @achyutkneupane
+
+### 🔍 Tests
+
+- test: Unit Tests added for Log class (#35) by @achyutkneupane
+- test: Feature tests added (#37) by @achyutkneupane
+
 ## v1.1.2 - 2025-08-06
 
 - no changes
