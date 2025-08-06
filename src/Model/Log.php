@@ -133,7 +133,7 @@ final class Log
         return trim($raw);
     }
 
-    private static function extractStack(string $raw): ?string
+    private static function extractStack(string $raw): string
     {
         $stackTrace = app(Pipeline::class)
             ->send($raw)
@@ -154,7 +154,7 @@ final class Log
             ->thenReturn();
 
         if (empty($stackTrace)) {
-            return null;
+            return json_encode([]);
         }
 
         return json_encode($stackTrace);

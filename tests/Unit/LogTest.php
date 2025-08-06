@@ -5,27 +5,7 @@ declare(strict_types=1);
 use AchyutN\FilamentLogViewer\Model\Log;
 
 beforeEach(function () {
-    if (! is_dir(storage_path('logs'))) {
-        mkdir(storage_path('logs'), 0755, true);
-    }
-
-    $this->writeLog('laravel.log', '[2024-08-06 20:15:00] local.ERROR: Sample log');
-    $this->writeLog('other.log', '[2024-08-06 20:16:00] local.INFO: Another log');
-    $this->writeLog('not-a-log.txt', 'This is not a log');
-
-    $stackTraces = [
-        '[2024-08-06 20:17:00] local.ERROR: Sample log with stack trace at /path/to/file.php:123',
-        '[stacktrace]',
-        '#0 /path/to/another_file.php(456): someFunction()',
-        '#1 {main}',
-        '"}',
-        '[2024-08-06 20:18:00] local.ERROR: Another log with stack trace at /path/to/another_file.php:789',
-        '[stacktrace]',
-        '#0 /path/to/yet_another_file.php(101): anotherFunction()',
-        '#1 {main}',
-        '"}',
-    ];
-    $this->writeLog('stack-trace.log', implode("\n", $stackTraces));
+    $this->initializeLogs();
 });
 
 afterEach(function () {
@@ -89,7 +69,7 @@ describe('getRows', function () {
                         ->env->toBe('local')
                         ->log_level->tobe(AchyutN\FilamentLogViewer\Enums\LogLevel::ERROR)
                         ->message->toBe('Sample log')
-                        ->stack->toBeNull()
+                        ->stack->toBe('[]')
                         ->file->toBe('laravel.log');
                 },
                 function ($log) {
@@ -98,7 +78,7 @@ describe('getRows', function () {
                         ->env->toBe('local')
                         ->log_level->tobe(AchyutN\FilamentLogViewer\Enums\LogLevel::INFO)
                         ->message->toBe('Another log')
-                        ->stack->toBeNull()
+                        ->stack->toBe('[]')
                         ->file->toBe('other.log');
                 },
                 function ($log) {
@@ -168,7 +148,7 @@ describe('getLogsByLogLevel', function () {
                         ->env->toBe('local')
                         ->log_level->tobe(AchyutN\FilamentLogViewer\Enums\LogLevel::INFO)
                         ->message->toBe('Another log')
-                        ->stack->toBeNull()
+                        ->stack->toBe('[]')
                         ->file->toBe('other.log');
                 }
             );
