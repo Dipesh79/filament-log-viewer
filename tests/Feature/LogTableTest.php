@@ -35,6 +35,14 @@ it('has actions', function () {
         });
 });
 
+it("refreshes logs on 'refresh' action", function () {
+    livewire(LogTable::class)
+        ->assertCountTableRecords(4)
+        ->callAction('refresh')
+        ->assertSuccessful()
+        ->assertCountTableRecords(4);
+});
+
 it("clears logs on 'clear' action", function () {
     livewire(LogTable::class)
         ->assertCountTableRecords(4)
