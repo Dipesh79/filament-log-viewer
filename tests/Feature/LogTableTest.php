@@ -83,7 +83,12 @@ describe('columns', function () {
         livewire(LogTable::class)
             ->assertCanNotRenderTableColumn('env')
             ->assertTableColumnExists('env', function (TextColumn $column) {
-                return $column->isBadge() && $column->getColor('local') === Color::Blue;
+                return $column->isBadge() &&
+                    $column->getColor('local') === Color::Blue &&
+                    $column->getColor('production') === Color::Red &&
+                    $column->getColor('staging') === Color::Orange &&
+                    $column->getColor('testing') === Color::Gray &&
+                    $column->getColor('default') === Color::Yellow;
             });
     });
 });
