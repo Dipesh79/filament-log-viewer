@@ -6,6 +6,7 @@ namespace AchyutN\FilamentLogViewer\Tests\Feature;
 
 use AchyutN\FilamentLogViewer\LogTable;
 use Carbon\Carbon;
+use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 
 use function Pest\Livewire\livewire;
@@ -29,14 +30,25 @@ it('has actions', function () {
 it('has table columns', function () {
     livewire(LogTable::class)
         ->assertTableColumnExists('date')
+        ->assertTableColumnExists('env')
         ->assertTableColumnExists('log_level')
-        ->assertTableColumnExists('message');
+        ->assertTableColumnExists('message')
+        ->assertTableColumnExists('file');
 });
 
 it('has badge in log_level column', function () {
     livewire(LogTable::class)
+        ->assertCanRenderTableColumn('log_level')
         ->assertTableColumnExists('log_level', function (TextColumn $column) {
             return $column->isBadge();
+        });
+});
+
+it('has Badge & Color in env column', function () {
+    livewire(LogTable::class)
+        ->assertCanNotRenderTableColumn('env')
+        ->assertTableColumnExists('env', function (TextColumn $column) {
+            return $column->isBadge() && $column->getColor('local') === Color::Blue;
         });
 });
 
