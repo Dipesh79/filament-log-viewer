@@ -6,6 +6,7 @@ namespace AchyutN\FilamentLogViewer\Tests\Feature;
 
 use AchyutN\FilamentLogViewer\LogTable;
 use Carbon\Carbon;
+use Filament\Tables\Columns\TextColumn;
 
 use function Pest\Livewire\livewire;
 
@@ -30,6 +31,13 @@ it('has table columns', function () {
         ->assertTableColumnExists('date')
         ->assertTableColumnExists('log_level')
         ->assertTableColumnExists('message');
+});
+
+it('has badge in log_level column', function () {
+    livewire(LogTable::class)
+        ->assertTableColumnExists('log_level', function (TextColumn $column) {
+            return $column->isBadge();
+        });
 });
 
 it('has table filters', function () {
