@@ -6,6 +6,7 @@ namespace AchyutN\FilamentLogViewer\Tests\Feature;
 
 use AchyutN\FilamentLogViewer\LogTable;
 use Carbon\Carbon;
+use Filament\Actions\Action;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 
@@ -23,8 +24,32 @@ it('renders successfully', function () {
 
 it('has actions', function () {
     livewire(LogTable::class)
-        ->assertActionExists('refresh')
-        ->assertActionExists('clear');
+        ->assertActionExists('refresh', function (Action $action) {
+            return $action->getLabel() === 'Refresh' &&
+                $action->isOutlined();
+        })
+        ->assertActionExists('clear', function (Action $action) {
+            return $action->getLabel() === 'Clear Logs' &&
+                ! $action->isOutlined() &&
+                $action->getColor() === Color::Red;
+        });
+});
+
+it("clears logs on 'clear' action", function () {
+    livewire(LogTable::class)
+        ->assertCountTableRecords(4)
+        ->callAction('clear')
+        ->assertSuccessful()
+        ->assertCountTableRecords(0);
+});
+
+it("show notification on 'clear' action", function () {
+    livewire(LogTable::class)
+        ->callAction('clear')
+        ->assertSuccessful()
+        ->mountAction('submit')
+        ->assertNotified('Logs Cleared');
+
 });
 
 it('has table columns', function () {
