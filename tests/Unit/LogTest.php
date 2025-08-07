@@ -43,6 +43,10 @@ describe('destroyAllLogs', function () {
     it('does nothing if log folder does not exist', function () {
         $this->deleteAllLogs();
 
+        $directory = storage_path('logs');
+
+        system('rm -rf '.escapeshellarg($directory));
+
         expect(fn () => Log::destroyAllLogs())->not->toThrow(Exception::class);
     });
 });
