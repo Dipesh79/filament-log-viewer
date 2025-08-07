@@ -22,6 +22,17 @@ it('renders successfully', function () {
         ->assertSee('Log Table');
 });
 
+it('table is unscoped by default', function () {
+    $unscopedLogLevel = livewire(LogTable::class)
+        ->get('unscopedLogLevel');
+
+    expect(livewire(LogTable::class)->get('unscopedLogLevel'))
+        ->toBe($unscopedLogLevel);
+
+    expect(livewire(LogTable::class)->get('activeTab'))
+        ->toBeIn([$unscopedLogLevel, null]);
+});
+
 it('has actions', function () {
     livewire(LogTable::class)
         ->assertActionExists('refresh', function (Action $action) {
